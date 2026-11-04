@@ -1,198 +1,133 @@
-import { useState, useEffect } from 'react';
-import { Employee, EmployeeFormData } from './types';
-import EmployeeForm from './components/EmployeeForm';
-import EmployeeTable from './components/EmployeeTable';
-import StatsCards from './components/StatsCards';
-import SearchBar from './components/SearchBar';
-import Modal from './components/Modal';
+import { useState } from 'react';
 
 function App() {
-  const [employees, setEmployees] = useState<Employee[]>(() => {
-    const saved = localStorage.getItem('employees');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterDepartment, setFilterDepartment] = useState('all');
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-  const [showForm, setShowForm] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem('employees', JSON.stringify(employees));
-  }, [employees]);
-
-  useEffect(() => {
-    if (notification) {
-      const timer = setTimeout(() => setNotification(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [notification]);
-
-  const showNotification = (message: string, type: 'success' | 'error' | 'info') => {
-    setNotification({ message, type });
+  const handleCopyPath = () => {
+    navigator.clipboard.writeText('public/سامانه_پرسنل.bat');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
-
-  const generateId = () => {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-  };
-
-  const handleAddEmployee = (data: EmployeeFormData) => {
-    const newEmployee: Employee = {
-      ...data,
-      id: generateId(),
-      createdAt: new Date().toISOString(),
-    };
-    setEmployees(prev => [newEmployee, ...prev]);
-    setShowForm(false);
-    showNotification('پرسنل جدید با موفقیت ثبت شد', 'success');
-  };
-
-  const handleUpdateEmployee = (data: EmployeeFormData) => {
-    if (!editingEmployee) return;
-    setEmployees(prev =>
-      prev.map(emp =>
-        emp.id === editingEmployee.id ? { ...emp, ...data } : emp
-      )
-    );
-    setEditingEmployee(null);
-    setShowForm(false);
-    showNotification('اطلاعات پرسنل با موفقیت ویرایش شد', 'success');
-  };
-
-  const handleDeleteEmployee = () => {
-    if (!deletingId) return;
-    setEmployees(prev => prev.filter(emp => emp.id !== deletingId));
-    setShowDeleteModal(false);
-    setDeletingId(null);
-    showNotification('پرسنل با موفقیت حذف شد', 'info');
-  };
-
-  const handleEdit = (employee: Employee) => {
-    setEditingEmployee(employee);
-    setShowForm(true);
-  };
-
-  const handleDelete = (id: string) => {
-    setDeletingId(id);
-    setShowDeleteModal(true);
-  };
-
-  const departments = [...new Set(employees.map(emp => emp.department))];
-
-  const filteredEmployees = employees.filter(emp => {
-    const matchesSearch =
-      emp.firstName.includes(searchTerm) ||
-      emp.lastName.includes(searchTerm) ||
-      emp.personnelCode.includes(searchTerm) ||
-      emp.nationalId.includes(searchTerm) ||
-      emp.phone.includes(searchTerm);
-    const matchesDepartment = filterDepartment === 'all' || emp.department === filterDepartment;
-    return matchesSearch && matchesDepartment;
-  });
 
   return (
-    <div className="min-h-screen p-4 md:p-6 lg:p-8">
-      {/* Notification */}
-      {notification && (
-        <div className="fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 animate-slide-in">
-          <div className={`glass rounded-xl p-4 flex items-center gap-3 ${
-            notification.type === 'success' ? 'border-green-500/30' :
-            notification.type === 'error' ? 'border-red-500/30' : 'border-blue-500/30'
-          }`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              notification.type === 'success' ? 'bg-green-500/20 text-green-400' :
-              notification.type === 'error' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'
-            }`}>
-              <i className={`fas ${
-                notification.type === 'success' ? 'fa-check' :
-                notification.type === 'error' ? 'fa-times' : 'fa-info'
-              }`}></i>
-            </div>
-            <p className="text-white text-sm">{notification.message}</p>
+    <div className="min-h-screen flex items-center justify-center p-4" dir="rtl">
+      <div className="glass rounded-2xl p-8 max-w-2xl w-full animate-fade-in">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/20">
+            <i className="fas fa-users text-white text-3xl"></i>
           </div>
+          <h1 className="text-3xl font-bold text-white mb-2">سامانه ثبت نام پرسنل</h1>
+          <p className="text-slate-400">نسخه دسکتاپ - قابل اجرا بدون نیاز به سرور</p>
         </div>
-      )}
 
-      {/* Header */}
-      <header className="glass rounded-2xl p-6 mb-6 animate-fade-in">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <i className="fas fa-users text-white text-xl"></i>
+        {/* Info */}
+        <div className="glass-light rounded-xl p-5 mb-6">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+              <i className="fas fa-info-circle text-blue-400"></i>
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">سامانه ثبت نام پرسنل</h1>
-              <p className="text-slate-400 text-sm mt-1">مدیریت اطلاعات کارکنان سازمان</p>
+              <h3 className="text-white font-medium mb-1">راهنمای استفاده</h3>
+              <p className="text-slate-400 text-sm leading-7">
+                برای استفاده از نسخه دسکتاپ، دو فایل زیر را دانلود کرده و در یک پوشه قرار دهید.
+                سپس فایل <span className="text-blue-400 font-medium">.bat</span> را اجرا کنید تا سامانه در مرورگر باز شود.
+              </p>
             </div>
           </div>
-          <button
-            onClick={() => { setEditingEmployee(null); setShowForm(true); }}
-            className="bg-gradient-to-l from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-all duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-105"
-          >
-            <i className="fas fa-plus"></i>
-            <span>ثبت پرسنل جدید</span>
-          </button>
         </div>
-      </header>
 
-      {/* Stats */}
-      <StatsCards employees={employees} />
-
-      {/* Search & Filter */}
-      <SearchBar
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        filterDepartment={filterDepartment}
-        setFilterDepartment={setFilterDepartment}
-        departments={departments}
-      />
-
-      {/* Employee Table */}
-      <EmployeeTable
-        employees={filteredEmployees}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
-
-      {/* Form Modal */}
-      {showForm && (
-        <Modal onClose={() => { setShowForm(false); setEditingEmployee(null); }}>
-          <EmployeeForm
-            onSubmit={editingEmployee ? handleUpdateEmployee : handleAddEmployee}
-            initialData={editingEmployee}
-            isEditing={!!editingEmployee}
-          />
-        </Modal>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <Modal onClose={() => { setShowDeleteModal(false); setDeletingId(null); }}>
-          <div className="text-center p-6">
-            <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
-              <i className="fas fa-trash-alt text-red-400 text-2xl"></i>
+        {/* Download Files */}
+        <div className="space-y-4 mb-6">
+          {/* BAT File */}
+          <a
+            href="/سامانه_پرسنل.bat"
+            download
+            className="flex items-center gap-4 p-4 rounded-xl border border-slate-700/50 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all duration-300 group"
+          >
+            <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+              <i className="fas fa-terminal text-green-400 text-lg"></i>
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">حذف پرسنل</h3>
-            <p className="text-slate-400 mb-6">آیا از حذف این پرسنل اطمینان دارید؟ این عملیات قابل بازگشت نیست.</p>
-            <div className="flex gap-3 justify-center">
-              <button
-                onClick={handleDeleteEmployee}
-                className="bg-red-600 hover:bg-red-500 text-white px-6 py-2.5 rounded-xl font-medium transition-all duration-300"
-              >
-                بله، حذف شود
-              </button>
-              <button
-                onClick={() => { setShowDeleteModal(false); setDeletingId(null); }}
-                className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2.5 rounded-xl font-medium transition-all duration-300"
-              >
-                انصراف
-              </button>
+            <div className="flex-1">
+              <h4 className="text-white font-medium">فایل اجرایی (.bat)</h4>
+              <p className="text-slate-400 text-xs mt-1">دابل کلیک کنید تا سامانه باز شود</p>
             </div>
-          </div>
-        </Modal>
-      )}
+            <div className="text-blue-400 group-hover:translate-x-[-4px] transition-transform">
+              <i className="fas fa-download"></i>
+            </div>
+          </a>
+
+          {/* HTML File */}
+          <a
+            href="/personnel.html"
+            download
+            className="flex items-center gap-4 p-4 rounded-xl border border-slate-700/50 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all duration-300 group"
+          >
+            <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+              <i className="fas fa-file-code text-blue-400 text-lg"></i>
+            </div>
+            <div className="flex-1">
+              <h4 className="text-white font-medium">فایل HTML سامانه</h4>
+              <p className="text-slate-400 text-xs mt-1">فایل اصلی برنامه - بدون نیاز به اینترنت</p>
+            </div>
+            <div className="text-blue-400 group-hover:translate-x-[-4px] transition-transform">
+              <i className="fas fa-download"></i>
+            </div>
+          </a>
+
+          {/* Open in Browser */}
+          <a
+            href="/personnel.html"
+            target="_blank"
+            className="flex items-center gap-4 p-4 rounded-xl border border-slate-700/50 hover:border-purple-500/30 hover:bg-purple-500/5 transition-all duration-300 group"
+          >
+            <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+              <i className="fas fa-external-link-alt text-purple-400 text-lg"></i>
+            </div>
+            <div className="flex-1">
+              <h4 className="text-white font-medium">اجرا در مرورگر</h4>
+              <p className="text-slate-400 text-xs mt-1">نسخه آنلاین را همین الان مشاهده کنید</p>
+            </div>
+            <div className="text-purple-400 group-hover:translate-x-[-4px] transition-transform">
+              <i className="fas fa-arrow-left"></i>
+            </div>
+          </a>
+        </div>
+
+        {/* Features */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          {[
+            { icon: 'fa-plus-circle', label: 'ثبت پرسنل', color: 'text-blue-400' },
+            { icon: 'fa-search', label: 'جستجو و فیلتر', color: 'text-green-400' },
+            { icon: 'fa-edit', label: 'ویرایش اطلاعات', color: 'text-amber-400' },
+            { icon: 'fa-database', label: 'ذخیره محلی', color: 'text-purple-400' },
+          ].map((f, i) => (
+            <div key={i} className="text-center p-3 rounded-lg bg-slate-800/30">
+              <i className={`fas ${f.icon} ${f.color} text-lg mb-2`}></i>
+              <p className="text-slate-300 text-xs">{f.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Instructions */}
+        <div className="glass-light rounded-xl p-5">
+          <h3 className="text-white font-medium mb-3 flex items-center gap-2">
+            <i className="fas fa-list-ol text-blue-400"></i>
+            مراحل نصب
+          </h3>
+          <ol className="text-slate-400 text-sm space-y-2 list-decimal list-inside">
+            <li>هر دو فایل <span className="text-white">.bat</span> و <span className="text-white">.html</span> را دانلود کنید</li>
+            <li>آن‌ها را در یک پوشه قرار دهید</li>
+            <li>فایل <span className="text-green-400">.bat</span> را دابل کلیک کنید</li>
+            <li>سامانه در مرورگر پیش‌فرض باز می‌شود</li>
+          </ol>
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-slate-500 text-xs mt-6">
+          ساخته شده با ❤️ | HTML + CSS + JavaScript | بدون نیاز به سرور
+        </p>
+      </div>
     </div>
   );
 }
