@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سامانه ثبت نام پرسنل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        body {
+            direction: rtl;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+        }
+
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .animate-slide-in { animation: slideIn 0.4s ease-out forwards; }
+
+        /* Glass Effect */
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+        }
+
+        .input-focus:focus {
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3), 0 0 15px rgba(59, 130, 246, 0.1);
+        }
+
+        .table-row-hover:hover {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Header */
+        .header {
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, #3b82f6, #9333ea);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+        }
+
+        .header-icon i { color: white; font-size: 1.25rem; }
+
+        .header h1 { font-size: 1.75rem; font-weight: 700; }
+        .header p { color: #94a3b8; font-size: 0.875rem; margin-top: 0.25rem; }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(to left, #2563eb, #3b82f6);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 0.9rem;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to left, #3b82f6, #60a5fa);
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+            padding: 0.625rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        .btn-danger:hover { background: #ef4444; }
+
+        .btn-secondary {
+            background: #334155;
+            color: white;
+            padding: 0.625rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        .btn-secondary:hover { background: #475569; }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            border-radius: 0.75rem;
+            padding: 1rem;
+            transition: all 0.3s;
+        }
+        .stat-card:hover { transform: scale(1.05); }
+
+        .stat-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .stat-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-value { font-size: 1.5rem; font-weight: 700; }
+        .stat-label { color: #94a3b8; font-size: 0.75rem; }
+
+        /* Search */
+        .search-bar {
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-input-wrap {
+            flex: 1;
+            position: relative;
+            min-width: 200px;
+        }
+        .search-input-wrap i {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .filter-wrap {
+            position: relative;
+            min-width: 180px;
+        }
+        .filter-wrap .icon-right {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+        }
+        .filter-wrap .icon-left {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        /* Inputs */
+        input, select {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 0.875rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus {
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3), 0 0 15px rgba(59, 130, 246, 0.1);
+        }
+        input::placeholder { color: #64748b; }
+        select { cursor: pointer; appearance: none; }
+        select option { background: #1e293b; color: white; }
+
+        /* Table */
+        .table-container {
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { border-bottom: 1px solid rgba(51, 65, 85, 0.5); }
+        th {
+            text-align: right;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+        }
+        tbody tr {
+            border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+            transition: background 0.2s;
+        }
+        tbody tr:hover { background: rgba(59, 130, 246, 0.08); }
+        td { padding: 0.75rem 1rem; font-size: 0.85rem; color: #cbd5e1; }
+
+        .emp-avatar {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.5rem;
+            background: linear-gradient(135deg, #3b82f6, #9333ea);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .emp-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .emp-name-cell span { color: white; font-weight: 500; }
+
+        .action-btns {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .action-btn i { font-size: 0.7rem; }
+
+        .btn-edit {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+        }
+        .btn-edit:hover { background: rgba(59, 130, 246, 0.2); }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+        }
+        .btn-delete:hover { background: rgba(239, 68, 68, 0.2); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            position: relative;
+            z-index: 50;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 42rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(59, 130, 246, 0.1);
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.5rem;
+            background: rgba(51, 65, 85, 0.5);
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        .modal-close:hover { background: #475569; color: white; }
+
+        /* Form */
+        .form-container { padding: 1.5rem; }
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-header-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            background: rgba(59, 130, 246, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-group label {
+            display: block;
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .form-group label i { color: #60a5fa; margin-left: 0.25rem; }
+        .form-error { color: #f87171; font-size: 0.7rem; margin-top: 0.25rem; }
+        .input-error { border-color: #ef4444 !important; }
+
+        .form-submit {
+            margin-top: 1.5rem;
+            width: 100%;
+            background: linear-gradient(to left, #2563eb, #3b82f6);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+        }
+        .form-submit:hover {
+            background: linear-gradient(to left, #3b82f6, #60a5fa);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            right: 1rem;
+            z-index: 100;
+            animation: slideIn 0.4s ease-out;
+        }
+        .notification-inner {
+            max-width: 24rem;
+            margin-right: auto;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .notification-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Empty State */
+        .empty-state {
+            border-radius: 0.75rem;
+            padding: 3rem;
+            text-align: center;
+        }
+        .empty-icon {
+            width: 5rem;
+            height: 5rem;
+            border-radius: 50%;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        .empty-icon i { color: #64748b; font-size: 1.75rem; }
+        .empty-state h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .empty-state p { color: #94a3b8; }
+
+        /* Delete Modal */
+        .delete-modal { text-align: center; padding: 1.5rem; }
+        .delete-icon {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        .delete-icon i { color: #f87171; font-size: 1.5rem; }
+        .delete-modal h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .delete-modal p { color: #94a3b8; margin-bottom: 1.5rem; }
+        .delete-btns { display: flex; gap: 0.75rem; justify-content: center; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-grid { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.3rem; }
+            .desktop-table { display: none; }
+            .mobile-cards { display: block !important; }
+        }
+        @media (min-width: 769px) {
+            .mobile-cards { display: none !important; }
+        }
+
+        .mobile-card {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+        }
+        .mobile-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        .mobile-card-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .mobile-card-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            background: linear-gradient(135deg, #3b82f6, #9333ea);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .mobile-card-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 0.75rem;
+        }
+        .mobile-card-details i { color: #64748b; margin-left: 0.25rem; }
+        .mobile-card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .mobile-card-actions button {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: all 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Notification -->
+        <div id="notification" class="notification" style="display:none;"></div>
+
+        <!-- Header -->
+        <header class="header glass animate-fade-in">
+            <div class="header-right">
+                <div class="header-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <h1>سامانه ثبت نام پرسنل</h1>
+                    <p>مدیریت اطلاعات کارکنان سازمان</p>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="openAddForm()">
+                <i class="fas fa-plus"></i>
+                <span>ثبت پرسنل جدید</span>
+            </button>
+        </header>
+
+        <!-- Stats -->
+        <div id="statsGrid" class="stats-grid animate-fade-in"></div>
+
+        <!-- Search -->
+        <div class="search-bar glass animate-fade-in">
+            <div class="search-input-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="جستجو بر اساس نام، کد پرسنلی، کد ملی یا شماره تماس..." oninput="renderTable()">
+            </div>
+            <div class="filter-wrap">
+                <i class="fas fa-filter icon-right"></i>
+                <select id="filterSelect" onchange="renderTable()">
+                    <option value="all">همه دپارتمان‌ها</option>
+                </select>
+                <i class="fas fa-chevron-down icon-left"></i>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div id="tableContainer" class="table-container glass animate-fade-in"></div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modalOverlay" class="modal-overlay" style="display:none;">
+        <div class="modal-backdrop" onclick="closeModal()"></div>
+        <div class="modal-content glass" id="modalContent"></div>
+    </div>
+
+    <script>
+        // ===== Data =====
+        let employees = JSON.parse(localStorage.getItem('employees') || '[]');
+        let editingEmployee = null;
+        let deletingId = null;
+
+        const departments = [
+            'فناوری اطلاعات', 'منابع انسانی', 'مالی و حسابداری',
+            'بازاریابی و فروش', 'تولید', 'پشتیبانی', 'مدیریت', 'تحقیق و توسعه'
+        ];
+
+        const positions = [
+            'مدیر', 'سرپرست', 'کارشناس', 'کارشناس ارشد',
+            'تکنسین', 'اپراتور', 'کارآموز', 'مشاور'
+        ];
+
+        // ===== Save =====
+        function saveData() {
+            localStorage.setItem('employees', JSON.stringify(employees));
+        }
+
+        // ===== Notification =====
+        function showNotification(message, type) {
+            const el = document.getElementById('notification');
+            const colors = {
+                success: { border: 'rgba(34,197,94,0.3)', bg: 'rgba(34,197,94,0.2)', text: '#4ade80', icon: 'fa-check' },
+                error: { border: 'rgba(239,68,68,0.3)', bg: 'rgba(239,68,68,0.2)', text: '#f87171', icon: 'fa-times' },
+                info: { border: 'rgba(59,130,246,0.3)', bg: 'rgba(59,130,246,0.2)', text: '#60a5fa', icon: 'fa-info' }
+            };
+            const c = colors[type];
+            el.innerHTML = `
+                <div class="notification-inner glass" style="border-color:${c.border}">
+                    <div class="notification-icon" style="background:${c.bg};color:${c.text}">
+                        <i class="fas ${c.icon}"></i>
+                    </div>
+                    <p style="color:white;font-size:0.85rem;">${message}</p>
+                </div>`;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 3000);
+        }
+
+        // ===== Stats =====
+        function renderStats() {
+            const total = employees.length;
+            const active = employees.filter(e => e.status === 'active').length;
+            const inactive = employees.filter(e => e.status === 'inactive').length;
+            const onleave = employees.filter(e => e.status === 'onleave').length;
+
+            const stats = [
+                { label: 'کل پرسنل', value: total, icon: 'fa-users', bg: 'rgba(59,130,246,0.1)', color: '#60a5fa' },
+                { label: 'فعال', value: active, icon: 'fa-user-check', bg: 'rgba(34,197,94,0.1)', color: '#4ade80' },
+                { label: 'غیرفعال', value: inactive, icon: 'fa-user-times', bg: 'rgba(239,68,68,0.1)', color: '#f87171' },
+                { label: 'در مرخصی', value: onleave, icon: 'fa-user-clock', bg: 'rgba(245,158,11,0.1)', color: '#fbbf24' },
+            ];
+
+            document.getElementById('statsGrid').innerHTML = stats.map(s => `
+                <div class="stat-card glass">
+                    <div class="stat-content">
+                        <div class="stat-icon" style="background:${s.bg}">
+                            <i class="fas ${s.icon}" style="color:${s.color}"></i>
+                        </div>
+                        <div>
+                            <p class="stat-value">${s.value}</p>
+                            <p class="stat-label">${s.label}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== Filter =====
+        function updateFilterOptions() {
+            const depts = [...new Set(employees.map(e => e.department))];
+            const select = document.getElementById('filterSelect');
+            const current = select.value;
+            select.innerHTML = '<option value="all">همه دپارتمان‌ها</option>' +
+                depts.map(d => `<option value="${d}">${d}</option>`).join('');
+            select.value = current;
+        }
+
+        // ===== Table =====
+        function getStatusBadge(status) {
+            const map = {
+                active: { bg: 'rgba(34,197,94,0.2)', color: '#4ade80', border: 'rgba(34,197,94,0.3)', label: 'فعال', dot: '#4ade80' },
+                inactive: { bg: 'rgba(239,68,68,0.2)', color: '#f87171', border: 'rgba(239,68,68,0.3)', label: 'غیرفعال', dot: '#f87171' },
+                onleave: { bg: 'rgba(245,158,11,0.2)', color: '#fbbf24', border: 'rgba(245,158,11,0.3)', label: 'در مرخصی', dot: '#fbbf24' }
+            };
+            const s = map[status];
+            return `<span class="badge" style="background:${s.bg};color:${s.color};border:1px solid ${s.border}">
+                <span style="width:6px;height:6px;border-radius:50%;background:${s.dot};margin-left:6px;display:inline-block;"></span>
+                ${s.label}
+            </span>`;
+        }
+
+        function getFilteredEmployees() {
+            const search = document.getElementById('searchInput').value.trim();
+            const dept = document.getElementById('filterSelect').value;
+            return employees.filter(emp => {
+                const matchSearch = !search ||
+                    emp.firstName.includes(search) ||
+                    emp.lastName.includes(search) ||
+                    emp.personnelCode.includes(search) ||
+                    emp.nationalId.includes(search) ||
+                    emp.phone.includes(search);
+                const matchDept = dept === 'all' || emp.department === dept;
+                return matchSearch && matchDept;
+            });
+        }
+
+        function renderTable() {
+            const filtered = getFilteredEmployees();
+            const container = document.getElementById('tableContainer');
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+                        <h3>${employees.length === 0 ? 'لیست پرسنل خالی است' : 'نتیجه‌ای یافت نشد'}</h3>
+                        <p>${employees.length === 0 ? 'برای شروع، پرسنل جدید ثبت کنید' : 'فیلترهای جستجو را تغییر دهید'}</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="table-header">
+                    <div class="table-header-right">
+                        <i class="fas fa-table" style="color:#60a5fa;"></i>
+                        <span style="color:white;font-weight:500;">لیست پرسنل</span>
+                    </div>
+                    <span style="color:#94a3b8;font-size:0.85rem;">${filtered.length} نفر</span>
+                </div>
+
+                <!-- Desktop Table -->
+                <div class="desktop-table" style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ردیف</th>
+                                <th>نام و نام خانوادگی</th>
+                                <th>کد پرسنلی</th>
+                                <th>کد ملی</th>
+                                <th>شماره تماس</th>
+                                <th>دپارتمان</th>
+                                <th>سمت</th>
+                                <th>وضعیت</th>
+                                <th style="text-align:center;">عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filtered.map((emp, i) => `
+                                <tr>
+                                    <td>${i + 1}</td>
+                                    <td>
+                                        <div class="emp-name-cell">
+                                            <div class="emp-avatar">${emp.firstName[0]}${emp.lastName[0]}</div>
+                                            <span>${emp.firstName} ${emp.lastName}</span>
+                                        </div>
+                                    </td>
+                                    <td style="font-family:monospace;">${emp.personnelCode}</td>
+                                    <td style="font-family:monospace;">${emp.nationalId}</td>
+                                    <td style="font-family:monospace;direction:ltr;text-align:right;">${emp.phone}</td>
+                                    <td>${emp.department}</td>
+                                    <td>${emp.position}</td>
+                                    <td>${getStatusBadge(emp.status)}</td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="action-btn btn-edit" onclick="openEditForm('${emp.id}')" title="ویرایش">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn btn-delete" onclick="openDeleteModal('${emp.id}')" title="حذف">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="mobile-cards">
+                    ${filtered.map(emp => `
+                        <div class="mobile-card">
+                            <div class="mobile-card-header">
+                                <div class="mobile-card-info">
+                                    <div class="mobile-card-avatar">${emp.firstName[0]}${emp.lastName[0]}</div>
+                                    <div>
+                                        <p style="color:white;font-weight:500;font-size:0.85rem;">${emp.firstName} ${emp.lastName}</p>
+                                        <p style="color:#94a3b8;font-size:0.7rem;">کد: ${emp.personnelCode}</p>
+                                    </div>
+                                </div>
+                                ${getStatusBadge(emp.status)}
+                            </div>
+                            <div class="mobile-card-details">
+                                <div><i class="fas fa-fingerprint"></i>${emp.nationalId}</div>
+                                <div style="direction:ltr;text-align:right;"><i class="fas fa-phone"></i>${emp.phone}</div>
+                                <div><i class="fas fa-building"></i>${emp.department}</div>
+                                <div><i class="fas fa-briefcase"></i>${emp.position}</div>
+                            </div>
+                            <div class="mobile-card-actions">
+                                <button class="btn-edit" style="background:rgba(59,130,246,0.1);color:#60a5fa;" onclick="openEditForm('${emp.id}')">
+                                    <i class="fas fa-edit"></i> ویرایش
+                                </button>
+                                <button style="background:rgba(239,68,68,0.1);color:#f87171;" onclick="openDeleteModal('${emp.id}')">
+                                    <i class="fas fa-trash"></i> حذف
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>`;
+        }
+
+        // ===== Modal =====
+        function openModal(content) {
+            document.getElementById('modalContent').innerHTML = `
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+                ${content}`;
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+            editingEmployee = null;
+        }
+
+        // ===== Form =====
+        function openAddForm() {
+            editingEmployee = null;
+            openModal(renderForm(null, false));
+        }
+
+        function openEditForm(id) {
+            editingEmployee = employees.find(e => e.id === id);
+            if (editingEmployee) {
+                openModal(renderForm(editingEmployee, true));
+            }
+        }
+
+        function renderForm(data, isEditing) {
+            const d = data || { firstName: '', lastName: '', personnelCode: '', nationalId: '', phone: '', email: '', department: '', position: '', hireDate: '', status: 'active' };
+            return `
+                <div class="form-container">
+                    <div class="form-header">
+                        <div class="form-header-icon">
+                            <i class="fas ${isEditing ? 'fa-edit' : 'fa-user-plus'}" style="color:#60a5fa;"></i>
+                        </div>
+                        <h2 style="font-size:1.15rem;font-weight:700;">${isEditing ? 'ویرایش اطلاعات پرسنل' : 'ثبت پرسنل جدید'}</h2>
+                    </div>
+                    <form id="empForm" onsubmit="handleSubmit(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> نام</label>
+                                <input type="text" id="f_firstName" value="${d.firstName}" placeholder="نام">
+                                <div class="form-error" id="e_firstName"></div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> نام خانوادگی</label>
+                                <input type="text" id="f_lastName" value="${d.lastName}" placeholder="نام خانوادگی">
+                                <div class="form-error" id="e_lastName"></div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-id-badge"></i> کد پرسنلی</label>
+                                <input type="text" id="f_personnelCode" value="${d.personnelCode}" placeholder="کد پرسنلی">
+                                <div class="form-error" id="e_personnelCode"></div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-fingerprint"></i> کد ملی</label>
+                                <input type="text" id="f_nationalId" value="${d.nationalId}" placeholder="کد ملی ۱۰ رقمی" maxlength="10">
+                                <div class="form-error" id="e_nationalId"></div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-phone"></i> شماره تماس</label>
+                                <input type="text" id="f_phone" value="${d.phone}" placeholder="۰۹۱۲۳۴۵۶۷۸۹">
+                                <div class="form-error" id="e_phone"></div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> ایمیل</label>
+                                <input type="email" id="f_email" value="${d.email}" placeholder="example@email.com" dir="ltr">
+                                <div class="form-error" id="e_email"></div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-building"></i> دپارتمان</label>
+                                <select id="f_department">
+                                    <option value="">انتخاب دپارتمان</option>
+                                    ${departments.map(dep => `<option value="${dep}" ${d.department === dep ? 'selected' : ''}>${dep}</option>`).join('')}
+                                </select>
+                                <div class="form-error" id="e_department"></div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-briefcase"></i> سمت</label>
+                                <select id="f_position">
+                                    <option value="">انتخاب سمت</option>
+                                    ${positions.map(pos => `<option value="${pos}" ${d.position === pos ? 'selected' : ''}>${pos}</option>`).join('')}
+                                </select>
+                                <div class="form-error" id="e_position"></div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> تاریخ استخدام</label>
+                                <input type="date" id="f_hireDate" value="${d.hireDate}">
+                                <div class="form-error" id="e_hireDate"></div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-toggle-on"></i> وضعیت</label>
+                                <select id="f_status">
+                                    <option value="active" ${d.status === 'active' ? 'selected' : ''}>فعال</option>
+                                    <option value="inactive" ${d.status === 'inactive' ? 'selected' : ''}>غیرفعال</option>
+                                    <option value="onleave" ${d.status === 'onleave' ? 'selected' : ''}>در مرخصی</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="form-submit">
+                            <i class="fas ${isEditing ? 'fa-save' : 'fa-plus'}"></i>
+                            ${isEditing ? 'ذخیره تغییرات' : 'ثبت پرسنل'}
+                        </button>
+                    </form>
+                </div>`;
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            const fields = ['firstName', 'lastName', 'personnelCode', 'nationalId', 'phone', 'email', 'department', 'position', 'hireDate', 'status'];
+            const data = {};
+            let valid = true;
+
+            // Clear errors
+            fields.forEach(f => {
+                document.getElementById('e_' + f).textContent = '';
+                document.getElementById('f_' + f).classList.remove('input-error');
+            });
+
+            // Get values
+            fields.forEach(f => {
+                data[f] = document.getElementById('f_' + f).value.trim();
+            });
+
+            // Validate
+            if (!data.firstName) { setError('firstName', 'نام الزامی است'); valid = false; }
+            if (!data.lastName) { setError('lastName', 'نام خانوادگی الزامی است'); valid = false; }
+            if (!data.personnelCode) { setError('personnelCode', 'کد پرسنلی الزامی است'); valid = false; }
+            if (!data.nationalId) { setError('nationalId', 'کد ملی الزامی است'); valid = false; }
+            if (!data.phone) { setError('phone', 'شماره تماس الزامی است'); valid = false; }
+            if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) { setError('email', 'ایمیل معتبر نیست'); valid = false; }
+            if (!data.department) { setError('department', 'دپارتمان الزامی است'); valid = false; }
+            if (!data.position) { setError('position', 'سمت الزامی است'); valid = false; }
+            if (!data.hireDate) { setError('hireDate', 'تاریخ استخدام الزامی است'); valid = false; }
+
+            if (!valid) return;
+
+            if (editingEmployee) {
+                // Update
+                employees = employees.map(emp =>
+                    emp.id === editingEmployee.id ? { ...emp, ...data } : emp
+                );
+                showNotification('اطلاعات پرسنل با موفقیت ویرایش شد', 'success');
+            } else {
+                // Add
+                const newEmp = {
+                    ...data,
+                    id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                    createdAt: new Date().toISOString()
+                };
+                employees.unshift(newEmp);
+                showNotification('پرسنل جدید با موفقیت ثبت شد', 'success');
+            }
+
+            saveData();
+            closeModal();
+            refreshAll();
+        }
+
+        function setError(field, msg) {
+            document.getElementById('e_' + field).textContent = msg;
+            document.getElementById('f_' + field).classList.add('input-error');
+        }
+
+        // ===== Delete =====
+        function openDeleteModal(id) {
+            deletingId = id;
+            openModal(`
+                <div class="delete-modal">
+                    <div class="delete-icon"><i class="fas fa-trash-alt"></i></div>
+                    <h3>حذف پرسنل</h3>
+                    <p>آیا از حذف این پرسنل اطمینان دارید؟ این عملیات قابل بازگشت نیست.</p>
+                    <div class="delete-btns">
+                        <button class="btn-danger" onclick="confirmDelete()">بله، حذف شود</button>
+                        <button class="btn-secondary" onclick="closeModal()">انصراف</button>
+                    </div>
+                </div>`);
+        }
+
+        function confirmDelete() {
+            if (!deletingId) return;
+            employees = employees.filter(e => e.id !== deletingId);
+            deletingId = null;
+            saveData();
+            closeModal();
+            refreshAll();
+            showNotification('پرسنل با موفقیت حذف شد', 'info');
+        }
+
+        // ===== Refresh =====
+        function refreshAll() {
+            renderStats();
+            updateFilterOptions();
+            renderTable();
+        }
+
+        // ===== Init =====
+        refreshAll();
+    </script>
+</body>
+</html>
